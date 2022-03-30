@@ -156,41 +156,62 @@ jay.calcAge();
 console.log(jay.__proto__);
 */
 
+// Public fields
+// Private fields
+// Public Methods
+// Private Methods
+// there are static versions of each version
+
 class Account {
+  //1. Public field (instances)
+  locale = navigator.language;
+
+  //2. Private fields
+  #movements = [];
+  #pin;
   constructor(owner, currency, pin) {
     this.owner = owner;
     this.currency = currency;
-    this.pin = pin;
+    this.#pin = pin;
     //protected property
-    this._movements = [];
-    this.localte = navigator.language;
+    // this._movements = [];
+    // this.localte = navigator.language;
 
     console.log(`Thanks for opening an account, ${this.owner}`);
   }
   // public interface of our object
-
+  // these are public methods
   getMovements() {
-    return this._movements;
+    return this.#movements;
   }
 
   deposit(amount) {
-    this._movements.push(amount);
+    this.#movements.push(amount);
+    return this;
   }
   withdrawal(amount) {
     this.deposit(-amount);
-  }
-
-  _approveLoan() {
-    return true;
+    return this;
   }
 
   requestLoan(value) {
-    if (this.approveLoan()) {
+    if (this._approveLoan(value)) {
       this.deposit(value);
       console.log(`Loan approved`);
+      return this;
     } else {
       console.log('Loan denied');
+      return this;
     }
+  }
+
+  static helper() {
+    console.log('Please help');
+  }
+
+  //private method - hide implementation from outside
+  _approveLoan(value) {
+    return true;
   }
 }
 
@@ -199,9 +220,42 @@ console.log(acct1);
 
 // acct1._movements.push(250);
 // acct1._movements.push(-240);
-
-acct1.deposit(250);
-acct1.withdrawal(400);
-acct1.requestLoan(1000);
-acct1._approveLoan();
+Account.helper();
+acct1.deposit(500).deposit(500);
+// acct1.#approveLoan(399);
 console.log(acct1.getMovements());
+
+class Car {
+  constructor(make, speed) {
+    this.make = make;
+    this.speed = speed;
+  }
+
+  accelerate() {
+    this.speed += 10;
+  }
+}
+
+class EV extends Car {
+  #battery;
+  constructor(make, speed, battery) {
+    super(make, speed);
+    this.#battery = battery;
+  }
+
+  accelerate() {
+    this.speed += 10;
+    this.#battery -= this.#battery * 0.01;
+    console.log(`This ${this.make} is going ${this.speed} mph`);
+    return this;
+  }
+
+  chargeBattery(val) {
+    this.#battery = val;
+    console.log(`This ${this.make} has a charge of ${this.#battery}`);
+    return this;
+  }
+}
+
+const rivian = new EV('Rivian', 60, 75);
+rivian.accelerate().chargeBattery(80);
